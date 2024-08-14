@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+@font-face {
+    font-family: 'Inter';
+    src: url('./assets/static/Inter_18pt-Medium.ttf') format('truetype'); 
+    font-weight: normal; /* Specify the weight if needed */
+    font-style: normal; /* Specify the style if needed */
+  }
+  body, html {
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #1B1A17;
+    display: flex;
+    justify-content: center;
+    font-family:'Inter';
+}
