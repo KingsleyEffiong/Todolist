@@ -4,20 +4,22 @@ import { collection, addDoc } from 'firebase/firestore';
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-function AddNewTasks() {
+function AddNewTasks({ user }) {
   const [titleTask, setTitleTask] = useState('');
   const [aboutTask, setAboutTask] = useState('');
   const tasksRef = collection(db, 'tasks');
 
   async function handleSubmitTask(e) {
-    e.preventDefault(); // Prevent the default form submission
+    e.preventDefault();
   
     if (titleTask.trim() && aboutTask.trim()) {
       try {
         await addDoc(tasksRef, {
+          userId: user.uid,  // Associate the task with the logged-in user
           titleTask: titleTask,
           aboutTask: aboutTask
         });
+        toast.success('Task added successfully');
         setTitleTask(''); 
         setAboutTask(''); 
       } catch (err) {
@@ -49,59 +51,13 @@ function AddNewTasks() {
         </div>
         <button 
           className="outline-none group"
-          onClick={handleSubmitTask} // Directly passing the function reference
+          onClick={handleSubmitTask} 
         >
-          <svg
-            className="block group-hover:hidden"
-            width="70"
-            height="70"
-            viewBox="0 0 70 70"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <rect
-              x="1"
-              y="1"
-              width="68"
-              height="68"
-              rx="7"
-              fill="#1B1A17"
-              stroke="#FF8303"
-              strokeWidth="2"
-            />
-            <path
-              fillRule="evenodd"
-              clipRule="evenodd"
-              d="M36.5 24C36.5 23.4477 36.0523 23 35.5 23H34.5C33.9477 23 33.5 23.4477 33.5 24V32.5C33.5 33.0523 33.0523 33.5 32.5 33.5H24C23.4477 33.5 23 33.9477 23 34.5V35.5C23 36.0523 23.4477 36.5 24 36.5H32.5C33.0523 36.5 33.5 36.9477 33.5 37.5V46C33.5 46.5523 33.9477 47 34.5 47H35.5C36.0523 47 36.5 46.5523 36.5 46V37.5C36.5 36.9477 36.9477 36.5 37.5 36.5H46C46.5523 36.5 47 36.0523 47 35.5V34.5C47 33.9477 46.5523 33.5 46 33.5H37.5C36.9477 33.5 36.5 33.0523 36.5 32.5V24Z"
-              fill="#FF8303"
-            />
-          </svg>
+          <svg width="70" height="70" viewBox="0 0 70 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="1" y="1" width="68" height="68" rx="7" fill="#1B1A17" stroke="#FF8303" stroke-width="2"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M36.5 24C36.5 23.4477 36.0523 23 35.5 23H34.5C33.9477 23 33.5 23.4477 33.5 24V32.5C33.5 33.0523 33.0523 33.5 32.5 33.5H24C23.4477 33.5 23 33.9477 23 34.5V35.5C23 36.0523 23.4477 36.5 24 36.5H32.5C33.0523 36.5 33.5 36.9477 33.5 37.5V46C33.5 46.5523 33.9477 47 34.5 47H35.5C36.0523 47 36.5 46.5523 36.5 46V37.5C36.5 36.9477 36.9477 36.5 37.5 36.5H46C46.5523 36.5 47 36.0523 47 35.5V34.5C47 33.9477 46.5523 33.5 46 33.5H37.5C36.9477 33.5 36.5 33.0523 36.5 32.5V24Z" fill="#FF8303"/>
+        </svg>
 
-          <svg
-            className="hidden group-hover:block"
-            width="70"
-            height="70"
-            viewBox="0 0 70 70"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <rect
-              x="1"
-              y="1"
-              width="68"
-              height="68"
-              rx="7"
-              fill="#23221F"
-              stroke="#FF8303"
-              strokeWidth="2"
-            />
-            <path
-              fillRule="evenodd"
-              clipRule="evenodd"
-              d="M36.5 24C36.5 23.4477 36.0523 23 35.5 23H34.5C33.9477 23 33.5 23.4477 33.5 24V32.5C33.5 33.0523 33.0523 33.5 32.5 33.5H24C23.4477 33.5 23 33.9477 23 34.5V35.5C23 36.0523 23.4477 36.5 24 36.5H32.5C33.0523 36.5 33.5 36.9477 33.5 37.5V46C33.5 46.5523 33.9477 47 34.5 47H35.5C36.0523 47 36.5 46.5523 36.5 46V37.5C36.5 36.9477 36.9477 36.5 37.5 36.5H46C46.5523 36.5 47 36.0523 47 35.5V34.5C47 33.9477 46.5523 33.5 46 33.5H37.5C36.9477 33.5 36.5 33.0523 36.5 32.5V24Z"
-              fill="#FF8303"
-            />
-          </svg>
         </button>
       </div>
       <ToastContainer />

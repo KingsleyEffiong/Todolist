@@ -4,15 +4,17 @@ import Tasks from './components/Tasks.jsx';
 import Footer from './components/Footer.jsx';
 import { useEffect, useState } from 'react';
 import image from './assets/todo list design.jpg';
+import GmailAuth from './components/GmailAuth.jsx';
+import Overlay from './components/Overlay.jsx';
 
 function App() {
   const [loading, setLoading] = useState(true);
+  const [showLogin, setShowLogin] = useState(true);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    // Simulate data fetching or Firebase initialization
     const fetchData = async () => {
-      // Replace with your actual data fetching logic
-      await new Promise(resolve => setTimeout(resolve, 6000)); // Simulating a 2-second delay
+      await new Promise(resolve => setTimeout(resolve, 6000));
       setLoading(false);
     };
 
@@ -28,8 +30,14 @@ function App() {
       )}
       <div className={`${loading ? 'hidden' : 'block'} flex flex-col justify-center items-center`}>
         <h1 className='my-7 text-white text-3xl uppercase font-bold'>Todo List ✍ </h1>
-        <TaskInput />
-        <Tasks />
+        {user && <TaskInput user={user} />}
+        {user && <Tasks user={user} />}
+        {showLogin && (
+          <>
+            <Overlay className="opacity-100"/>
+            <GmailAuth setShowLogin={setShowLogin} setUser={setUser} />
+          </>
+        )}
         <Footer />
       </div>
     </div>

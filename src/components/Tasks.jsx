@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { db } from "../Firebase";
-import { collection, getDocs, doc, deleteDoc, updateDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, deleteDoc, updateDoc, query, where } from 'firebase/firestore';
 import SocialIcons from './SocialIcons';
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Overlay from "./Overlay";
 
-function Tasks() {
+function Tasks({ user }) {
     const tasksRef = collection(db, 'tasks');
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -18,7 +19,8 @@ function Tasks() {
     useEffect(() => {
         async function handleGetTasks() {
             try {
-                const data = await getDocs(tasksRef);
+                const q = query(tasksRef, where("userId", "==", user.uid)); // Filter tasks by userId
+                const data = await getDocs(q);
                 const filteredData = data.docs.map((doc) => ({
                     ...doc.data(),
                     id: doc.id
@@ -30,11 +32,15 @@ function Tasks() {
                 setLoading(false);
             }
         }
+
+        handleGetTasks(); // Initial load
+
         const intervalId = setInterval(() => {
             handleGetTasks();
-        }, 10000); // Changed interval to 10 seconds to avoid excessive requests
+        }, 10000); // Interval to refresh the tasks
+
         return () => clearInterval(intervalId);
-    }, []);
+    }, [user]);
 
     const handleDeleteClick = (taskId) => {
         setSelectedTaskId(taskId);
@@ -54,7 +60,7 @@ function Tasks() {
             return;
         }
         try {
-            const taskRef = doc(db, 'tasks', selectedTaskId); // Ensure this ID is correct
+            const taskRef = doc(db, 'tasks', selectedTaskId);
             await updateDoc(taskRef, {
                 titleTask: editTaskTitle,
                 aboutTask: editTaskAbout,
@@ -69,7 +75,7 @@ function Tasks() {
             setShowEdit(false);
             toast.success('Task updated successfully');
         } catch (error) {
-            console.error("Error updating task:", error); // Use console.error for better error visibility
+            console.error("Error updating task:", error);
             toast.error('Failed to update task');
         }
     };
@@ -82,11 +88,11 @@ function Tasks() {
             }
             const deleteRef = doc(db, 'tasks', selectedTaskId);
             await deleteDoc(deleteRef);
-            setTasks(prevTasks => prevTasks.filter(task => task.id !== selectedTaskId));
+            setTasks(tasks.filter(task => task.id !== selectedTaskId));
             setShowAlert(false);
-            toast.success('Task deleted successfully');
+            toast.success("Task deleted successfully!");
         } catch (e) {
-            console.error("Error deleting task:", e);
+            toast.error(`Error: ${e.message}`);
         }
     };
 
@@ -116,7 +122,7 @@ function Tasks() {
                                 </svg>
                             </button>
                         </div>
-                        <SocialIcons handleEditClick={() => handleEditClick(task)}/>
+                        <SocialIcons handleEditClick={() => handleEditClick(task)} />
                     </div>
                 ))
             ) : (
@@ -130,7 +136,7 @@ function Tasks() {
                     <Alerts onConfirm={confirmDeleteTask} onCancel={cancelDeleteTask} />
                 </>
             )}
-            <ToastContainer /> 
+            <ToastContainer />
             {showEdit && (
                 <>
                     <Overlay />
@@ -148,51 +154,39 @@ function Tasks() {
     );
 }
 
-function Overlay() {
-    return (
-        <div className="bg-[#070707] opacity-85 z-10 fixed top-0 left-0 w-[100%] h-[100%] overflow-hidden"></div>
-    );
-}
-
 function Alerts({ onConfirm, onCancel }) {
     return (
         <div className="w-[281px] h-[143px] bg-[#1B1A17]  border-t-[#A35709] border-t-4 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 flex flex-col justify-center items-center">
             <h1 className="text-[#F0E3CA] text-xl mb-10">Delete this task?</h1>
             <div className='flex flex-row justify-around w-[100%]'>
                 <button onClick={onCancel} className="bg-[#242320] text-[#D9D9D9] p-2 w-[100px] rounded-sm border border-[#A35709]">Cancel</button>
-                <button onClick={onConfirm} className="bg-[#242320] text-[#D9D9D9] p-2 w-[100px] rounded-sm border border-[#A35709]">Confirm</button>
+                <button onClick={onConfirm} className="bg-[#A35709] text-[#D9D9D9] p-2 w-[100px] rounded-sm">Delete</button>
             </div>
         </div>
-    );
+    )
 }
 
 function EditTask({ editTaskAbout, setEditTaskAbout, editTaskTitle, setEditTaskTitle, handleEditTask, setShowEdit }) {
     return (
-        <div className="w-[360px] h-[470px] bg-[#242320] absolute bottom-0 z-20">
-          <div className="justify-center items-center flex flex-col py-2 space-y-2">
-          <h1 className="text-[#F0E3CA] text-xl">Edit Task</h1>
-            <input 
+        <div className="w-[281px] h-[300px] bg-[#1B1A17] border-t-[#A35709] border-t-4 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 flex flex-col justify-center items-center space-y-5 p-5">
+            <h1 className="text-[#F0E3CA] text-xl mb-2">Edit Task</h1>
+            <input
                 type="text"
                 value={editTaskTitle}
                 onChange={(e) => setEditTaskTitle(e.target.value)}
+                className="w-[100%] p-2 bg-[#242320] text-[#F0E3CA] border border-[#A35709] rounded-sm"
                 placeholder="Task Title"
-                className="w-[324px] h-[32px] py-1 px-3 rounded-sm bg-[#242320] outline-none border border-[#FF8303] placeholder:text-[#F0E3CA] placeholder:opacity-40 text-white focus:bg-[#2B2A27"
             />
             <textarea
                 value={editTaskAbout}
                 onChange={(e) => setEditTaskAbout(e.target.value)}
-                placeholder="Task Description"
-                className="w-[324px] h-[342px] py-1 px-3 rounded-sm bg-[#242320] outline-none border border-[#FF8303] placeholder:text-[#F0E3CA] placeholder:opacity-40 text-white focus:bg-[#2B2A27]"
+                className="w-[100%] p-2 bg-[#242320] text-[#F0E3CA] border border-[#A35709] rounded-sm"
+                placeholder="About Task"
             />
-            <div className='flex flex-row justify-around w-[138px] h-[24]'>
-                <button onClick={handleEditTask} className="w-[64px] h-[24px] rounded-sm bg-[#242320] text-white border border-[#A35709] flex justify-center items-center py-3 px-2'">
-                  <span>Save</span>
-                </button>
-                <button onClick={() => setShowEdit(false)} className="w-[64px] h-[24px] rounded-sm bg-[#242320] text-white border border-[#A35709] flex justify-center items-center py-3 px-2">
-                  <span>Cancel</span>
-                </button>
+            <div className='flex flex-row justify-around w-[100%]'>
+                <button onClick={() => setShowEdit(false)} className="bg-[#242320] text-[#D9D9D9] p-2 w-[100px] rounded-sm border border-[#A35709]">Cancel</button>
+                <button onClick={handleEditTask} className="bg-[#A35709] text-[#D9D9D9] p-2 w-[100px] rounded-sm">Save</button>
             </div>
-          </div>
         </div>
     );
 }
