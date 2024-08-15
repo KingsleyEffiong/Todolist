@@ -1,5 +1,5 @@
 
-function SocialIcons(){
+function SocialIcons({handleEditClick}){
     return(
       <div className="w-[100%] h-[36px] flex flex-row space-x-2 my-2 justify-end">
         <button>
@@ -16,7 +16,7 @@ function SocialIcons(){
         </svg>
         </button>
 
-        <button>
+        <button onClick={handleEditClick}>
        <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect x="0.5" y="0.5" width="35" height="35" rx="5.5" fill="#242320" stroke="#A35709"/>
         <g clipPath="url(#clip0_23_123)">
@@ -28,7 +28,6 @@ function SocialIcons(){
         </clipPath>
         </defs>
         </svg>
-
         </button>
 
       </div>

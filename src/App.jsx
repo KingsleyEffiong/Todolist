@@ -7,9 +7,10 @@ function App() {
     <div className='flex flex-col justify-center items-center'>
       <h1 className='my-7 text-white text-3xl uppercase font-bold'>Todo List ✍ </h1>
       <TaskInput />
-      <Tasks />
+      <Tasks/>
     </div>
   )
 }
+
 
 export default App
