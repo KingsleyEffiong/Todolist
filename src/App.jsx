@@ -1,18 +1,39 @@
-import './index.css'
+import './index.css';
 import TaskInput from './components/AddNewTasks.jsx';
 import Tasks from './components/Tasks.jsx';
 import Footer from './components/Footer.jsx';
+import { useEffect, useState } from 'react';
+import image from './assets/todo list design.jpg';
 
 function App() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate data fetching or Firebase initialization
+    const fetchData = async () => {
+      // Replace with your actual data fetching logic
+      await new Promise(resolve => setTimeout(resolve, 6000)); // Simulating a 2-second delay
+      setLoading(false);
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <div className='flex flex-col justify-center items-center'>
-      <h1 className='my-7 text-white text-3xl uppercase font-bold'>Todo List ✍ </h1>
-      <TaskInput />
-      <Tasks/>
-      <Footer />
+      {loading && (
+        <div className="absolute inset-0 flex justify-center items-center bg-black">
+          <img src={image} alt="Loading" className="w-full h-full  object-fill" />
+        </div>
+      )}
+      <div className={`${loading ? 'hidden' : 'block'} flex flex-col justify-center items-center`}>
+        <h1 className='my-7 text-white text-3xl uppercase font-bold'>Todo List ✍ </h1>
+        <TaskInput />
+        <Tasks />
+        <Footer />
+      </div>
     </div>
-  )
+  );
 }
 
-
-export default App
+export default App;
