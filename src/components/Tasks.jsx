@@ -105,7 +105,7 @@ function Tasks() {
                 tasks.map((task) => (
                     <div className="py-2 w-[345px] relative" key={task.id}>
                         <div className="flex flex-row justify-between items-center bg-[#242320] border border-[#A35709] rounded-md px-3 py-3">
-                            <div className="w-[265px] h-[46px] flex flex-col justify-normal">
+                            <div className="w-[265px] h-[auto] flex flex-col justify-normal">
                                 <h1 className="text-[#F0E3CA] text-lg font-bold">{task.titleTask}</h1>
                                 <h3 className="text-[#F0E3CA] text-base ">{task.aboutTask}</h3>
                             </div>
