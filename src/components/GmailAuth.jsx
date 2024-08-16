@@ -1,5 +1,6 @@
+import { useEffect } from "react";
 import { auth, googleProvider } from "../Firebase";
-import { signInWithPopup } from 'firebase/auth';
+import { signInWithPopup, onAuthStateChanged } from 'firebase/auth';
 
 function GmailAuth({ setShowLogin, setUser }) {
 
@@ -10,10 +11,33 @@ function GmailAuth({ setShowLogin, setUser }) {
 
             // Set the logged-in user in the App state
             setUser(auth.currentUser);
+
+            // Save the user's UID to localStorage
+            localStorage.setItem('user', auth.currentUser.uid);
         } catch (error) {
             console.log(error);
         }
-    }
+    };
+
+    // Check for existing user session
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                setShowLogin(false);
+                setUser(user);
+
+                // Save the user's UID to localStorage
+                localStorage.setItem('user', user.uid);
+            } else {
+                setShowLogin(true);
+                setUser(null);
+                localStorage.removeItem('user');
+            }
+        });
+
+        // Cleanup subscription on unmount
+        return () => unsubscribe();
+    }, [setShowLogin, setUser]);
 
     return (
         <div className='w-[300px] h-auto py-3 px-3 bg-[#1B1A17] border-t-[#A35709] border-t-4 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 flex flex-col justify-center items-center'>
